@@ -1,0 +1,294 @@
+---
+title: "R - Week 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1 : Basic statistics with R
+
+Basic statistics computation with R built-in functions.
+
+```{r}
+x = c(4,8,23,2,16,7)
+
+mean(x) # Compute the mean
+median(x) # Middle value
+length(x) # Number of value in vector or list
+range(x) # Largest and smallest value
+sd(x) # Standard Deviation
+var(x) # Variance
+
+sort(x) # Arange vector or list in right order
+
+summary(x) # Descriptive statistics (range, quartile, mean, median)
+```
+
+## Part 2 : Round numbers
+
+Ceiling function (positive values)
+
+```{r}
+ceiling(0)
+ceiling(0.1)
+ceiling(1)
+ceiling(1.1)
+ceiling(1.5)
+```
+
+Ceiling function (negative values)
+
+```{r}
+ceiling(-0.1)
+ceiling(-1)
+ceiling(-1.1)
+ceiling(-1.5)
+ceiling(-1.9)
+ceiling(-2)
+```
+
+Floor function (positive values)
+
+```{r}
+floor(1)
+floor(1.1)
+floor(1.5)
+floor(1.7)
+floor(1.9)
+```
+
+Floor function (negative values)
+
+```{r}
+floor(-0.1)
+floor(-0.5)
+floor(-0.9)
+floor(-1)
+floor(-1.1)
+```
+
+Trunc function (positive values)
+
+```{r}
+trunc(1)
+trunc(1.1)
+trunc(1.5)
+trunc(1.7)
+trunc(1.9)
+trunc(2)
+```
+
+Trunc function (negative values)
+
+```{r}
+trunc(-1)
+trunc(-1.1)
+trunc(-1.5)
+trunc(-1.7)
+trunc(-1.9)
+trunc(-2)
+```
+
+Round function (positive values)
+
+```{r}
+round(1)
+round(1.1)
+round(1.5)
+round(1.7)
+round(1.9)
+```
+
+Round function (negative values)
+
+```{r}
+round(-1)
+round(-1.1)
+round(-1.5)
+round(-1.7)
+round(-1.9)
+```
+
+Round function (with digits)
+
+```{r}
+round(1, digits = 0)
+round(1.123, digits = 1)
+round(-1.534, digits = 2)
+round(-1.778, digits = 3)
+round(-1.966, digits = 2)
+```
+
+Signif function 
+
+```{r}
+signif(1.949, digits = 2)
+signif(2.453, digits = 1)
+signif(-1.357, digits = 0)
+signif(3.5, digits = 1)
+signif(3.5, digits = 0)
+signif(3.500, digits = 2)
+```
+
+## Part 3 : Exploring data graphically
+
+```{r}
+# Explore data sets available on R
+data()
+```
+
+```{r}
+# Statistical analysis
+summary(cars)
+```
+
+```{r}
+# Graph plotting
+plot(cars)
+```
+
+```{r}
+# Speed ditribution in cars dataset
+hist(cars$speed)
+```
+
+```{r}
+# Distance distribution in cars dataset
+hist(cars$dist)
+```
+
+```{r}
+# Kernal density plots
+
+plot(density(cars$speed)) # Cars speed
+plot(density(cars$dist)) # Cars distance
+```
+
+# Data visualization with R
+
+```{r}
+# Import Thai tourism dataset by reding CSV file
+thai_tourist = read.csv("Thaitourism1.csv", header = TRUE)
+```
+
+```{r}
+# Describe characteristics of the dataset
+names(thai_tourist)
+head(thai_tourist)
+tail(thai_tourist)
+str(thai_tourist)
+summary(thai_tourist)
+```
+
+```{r}
+# Import Thai tourism dataset by reding CSV file
+thai_tourist_full = read.csv("Thaitourism2.csv", header = TRUE)
+```
+
+```{r}
+# Describe characteristics of the dataset
+names(thai_tourist_full)
+head(thai_tourist_full)
+tail(thai_tourist_full)
+str(thai_tourist_full)
+summary(thai_tourist_full)
+```
+
+```{r}
+# Contain only 2016 data
+thai_2016 = thai_tourist[thai_tourist$Year==2016,]
+thai_2016
+```
+
+```{r}
+# Contain only UK nationality
+thai_UK = thai_tourist_full[thai_tourist_full$nationality=="UnitedKingdom",]
+thai_UK
+```
+
+### Plot() function
+
+```{r}
+plot(thai_2016$Region, thai_2016$Tourists_1000s)
+plot(thai_2016$Region, thai_2016$Tourists_1000s, type = "l", lwd = 1, lty = 3)
+plot(thai_tourist$Year, thai_tourist$Tourists_1000s, pch = 20, cex = 2, col = thai_tourist$Region)
+```
+
+### Barplot() function
+
+```{r}
+barplot(thai_2016$Tourists_1000s, names.arg = thai_2016$Region)
+barplot(thai_2016$Tourists_1000s, names.arg = thai_2016$Region, horiz = TRUE)
+barplot(thai_2016$Tourists_1000s, names.arg = thai_2016$Region, col = rainbow(8))
+```
+
+### Hist() function
+
+```{r}
+hist(thai_UK$tourists, labels = TRUE)
+hist(thai_UK$tourists, breaks = 16)
+hist(thai_UK$tourists, freq = FALSE)
+hist(thai_UK$tourists, xlab = "N° ok UK tourists per month",labels = TRUE, col = rainbow(8))
+```
+
+### Boxplot() function
+
+```{r}
+thai_europe = droplevels(subset(thai_tourist_full, region=="Europe"))
+thai_europe
+```
+
+```{r}
+boxplot(thai_europe$tourists, data = thai_europe)
+boxplot(tourists ~ nationality, data = thai_europe, col = rainbow(16))
+boxplot(tourists ~ nationality, data = thai_europe, col = rainbow(16), horizontal = TRUE)
+boxplot(tourists ~ nationality, data = thai_europe, col = rainbow(16), subset= nationality %in% c("France", "Russia", "Germany"))
+```
+
+### Pie() function
+
+```{r}
+pie(thai_2016$Tourists_1000s, labels = thai_2016$Region, col = rainbow(8))
+```
+
+```{r}
+percent = round(100*thai_2016$Tourists_1000s/sum(thai_2016$Tourists_1000s),1)
+percent = paste(thai_2016$Region,"-",percent,"%") # add percents to labels
+pie(thai_2016$Tourists_1000s, labels = percent, col = rainbow(8))
+```
+
+# ggplot2
+
+```{r}
+# install ggplot2 packages
+install.packages("ggplot2",repos = "http://cran.us.r-project.org")
+library(ggplot2)
+```
+
+### Scatterplot with qplot() function
+
+```{r}
+qplot(Region, Tourists_1000s, data = thai_tourist, color = Year)
+qplot(Region, Tourists_1000s, data = thai_tourist, color = Year, size = I(4))
+```
+
+### Boxplot with qplot() function
+
+```{r}
+qplot(Region, Tourists_1000s, data = thai_tourist, geom = "boxplot", fill = "red")
+```
+
+### Barplot with qplot() function
+
+```{r}
+qplot(tourists, data = thai_UK, geom = "histogram", fill = "red")
+```
+
+### Density with qplot() function
+
+```{r}
+qplot(tourists, data = thai_UK, geom = "density", fill = "red")
+```
+
