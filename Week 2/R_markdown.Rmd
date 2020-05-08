@@ -1,0 +1,139 @@
+---
+title: "R_markdown"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1 : Exercise
+
+```{r}
+# The colCLasses is used to converst to factor
+market_basket = read.csv("marketbasket.csv", header = TRUE, colClasses = "factor")
+market_basket
+```
+
+```{r}
+# Statistical description and exploration of dataset
+names(market_basket)
+head(market_basket)
+tail(market_basket)
+str(market_basket)
+summary(market_basket)
+```
+
+```{r}
+dim(market_basket) # Check dataset dimension
+```
+
+```{r}
+# colSums() computes sum of columns
+yes = colSums(market_basket == "Yes")
+yes
+```
+
+```{r}
+no = colSums(market_basket == "No")
+no
+```
+
+```{r}
+purchased = rbind(yes,no)
+purchased
+```
+
+```{r}
+# Data visualization
+barplot(purchased, legend = rownames(purchased))
+barplot(purchased, beside = T, legend = rownames(purchased))
+```
+
+```{r}
+# arules packeage is a tool for mining associative rules in transactional databases
+install.packages("arules", repos = "http://cran.us.r-project.org")
+library(arules)
+```
+
+```{r}
+# Apriori function from arules package implement the Apriori algorithm to create frequent itemsets.
+rules = apriori(market_basket)
+rules
+```
+
+```{r}
+summary(rules)
+```
+
+```{r}
+# Print the internal representation of an R object
+#inspect(rules)
+```
+
+```{r}
+# Set the minimum transaction to 2, maximum transection to 3 and confidence to 0.95
+rules = apriori(market_basket, parameter = list(minlen=2, maxlen=3, conf=0.95))
+rules
+```
+
+```{r}
+summary(rules)
+```
+
+```{r}
+rules = apriori(market_basket, parameter = list(minlen=2, maxlen=3, conf=0.70), appearance = list(rhs=c("cosmetics=Yes"), default="lhs")) 
+rules
+```
+
+```{r}
+inspect(rules)
+```
+
+```{r}
+# arulesViz package provides various visualization techniques for association rules and itemsets.
+install.packages("igraph", repos = "http://cran.us.r-project.org")
+library("igraph")
+```
+
+```{r}
+install.packages("arulesViz", repos = "http://cran.us.r-project.org")
+library(arulesViz)
+```
+
+```{r}
+plot(rules)
+plot(rules, method = "grouped")
+plot(rules@quality)
+```
+
+```{r}
+rules3 = apriori(market_basket, parameter = list(minlen=2, maxlen=4,conf=0.60), appearance = list(rhs=c("banana=Yes", "apples=Yes", "avocado=Yes"), default="lhs"))
+plotly_arules(rules3)
+plotly_arules(rules3, measure = c("support", "lift"), shading = "confidence")
+```
+
+```{r}
+rules2 = apriori(market_basket, parameter = list(minlen=2, maxlen=3,conf = 0.5), appearance =list(rhs=c("cosmetics=Yes"),
+lhs=c("apples=Yes",
+"banana=Yes",
+"coke=Yes",
+"turkey=Yes",
+"bourbon=Yes",
+"ice_cream=Yes",
+"baguette=Yes",
+"soda=Yes",
+"choclate=Yes",
+"cracker=Yes",
+"avocado=Yes",
+"sardines=Yes"),
+default="none"))
+
+inspect(rules2)
+```
+
+```{r}
+rules_ex <-apriori(market_basket, parameter =list(minlen=2,maxlen=4,conf=0.75))
+ruleExplorer(rules_ex)
+```
+
