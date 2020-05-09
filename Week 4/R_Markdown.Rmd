@@ -1,0 +1,321 @@
+---
+title: "R_Markdown"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise
+
+```{r}
+# Install tm package for text mining
+install.packages("tm")
+library(tm)
+```
+
+```{r}
+dataset <- readLines("TMwithR.txt", encoding = "UTF-8")
+dataset
+```
+
+```{r}
+# Statistical Analysis
+names(dataset)
+```
+
+```{r}
+head(dataset)
+```
+
+```{r}
+tail(dataset)
+```
+
+```{r}
+str(dataset)
+```
+
+```{r}
+summary(dataset)
+```
+
+```{r}
+# Converting text file to corpus
+mycorpus <- Corpus(VectorSource(dataset))
+mycorpus
+```
+
+```{r}
+inspect(mycorpus[1])
+```
+
+```{r}
+inspect(mycorpus[2])
+```
+
+```{r}
+inspect(mycorpus[3])
+```
+
+```{r}
+inspect(mycorpus[8])
+```
+
+```{r}
+# tm_map function is used for transformation functions to corpus
+mycorpus <- tm_map(mycorpus, tolower)
+inspect(mycorpus[8])
+```
+
+```{r}
+# Retrieve list of predefined transformations (mappings) which can be used with tm_map
+getTransformations()
+```
+
+```{r}
+# Remove punctuation
+mycorpus <- tm_map(mycorpus, removePunctuation)
+mycorpus <- tm_map(mycorpus, removeNumbers)
+inspect(mycorpus[8])
+```
+
+```{r}
+# Remove stopwords
+data_clean <- tm_map(mycorpus, removeWords, stopwords("english"))
+data_clean <- tm_map(data_clean, stripWhitespace)
+inspect(data_clean[8])
+```
+
+```{r}
+# Create Term Document Matrix (DTM)
+dtm <- TermDocumentMatrix(data_clean, control = list(minWordLength=c(1,Inf)))
+dtm
+```
+
+```{r}
+# findFreqTerms is used to find frequent items in a DTM
+findFreqTerms(dtm, lowfreq = 2)
+```
+
+```{r}
+termFrequency <-rowSums(as.matrix(dtm))
+termFrequency
+```
+
+```{r}
+termFrequency <- subset(termFrequency, termFrequency>=15)
+termFrequency
+```
+
+```{r}
+# Term Frequancy's visualization through graph
+barplot(termFrequency, las = 2, col = rainbow(20))
+```
+
+```{r}
+# Word cloud visualization package
+install.packages("wordcloud")
+library(wordcloud)
+```
+
+```{r}
+# Sort words by descending order
+wordfreq <- sort(termFrequency, decreasing = TRUE)
+wordfreq
+```
+
+```{r}
+wordcloud(words = names(wordfreq), freq = wordfreq, max.words = 100, min.freq = 5, random.order = FALSE, colors = rainbow(20))
+```
+
+```{r}
+# Plot the top 50 words through bar plot
+barplot(wordfreq[1:50], xlab = "Words", ylab = "Frequency", las = 2, col = heat.colors(50))
+```
+
+# Part 2 : Exercise
+
+```{r}
+bbchealth <- read.csv("Health_Tweets_Data/bbchealth.csv", header = TRUE, encoding = "UTF-8")
+cnnhealth <- read.csv("Health_Tweets_Data/cnnhealth.csv", header = TRUE, encoding = "UTF-8")
+foxhealth <- read.csv("Health_Tweets_Data/foxnewshealth.csv", header = TRUE, encoding = "UTF-8")
+```
+
+```{r}
+head(bbchealth)
+head(cnnhealth)
+head(foxhealth)
+```
+
+```{r}
+head(bbchealth$tweet)
+head(cnnhealth$tweet)
+head(foxhealth$tweet)
+```
+
+```{r}
+# Create text vectors
+bbchealth_tweet <- bbchealth$tweet
+cnnhealth_tweet <- cnnhealth$tweet
+foxhealth_tweet <- foxhealth$tweet
+```
+
+```{r}
+# Convert text vector to lower
+bbchealth_tweet <- tolower(bbchealth_tweet)
+cnnhealth_tweet <- tolower(cnnhealth_tweet)
+foxhealth_tweet <- tolower(foxhealth_tweet)
+```
+
+```{r}
+#Replace blank space (“rt”)
+bbchealth_tweet <- gsub("rt", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("rt", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("rt", "", foxhealth_tweet)
+#Replace tweeter @UserName
+bbchealth_tweet <- gsub("@\\w+", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("@\\w+", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("@\\w+", "", foxhealth_tweet)
+#Replace links in the tweets
+bbchealth_tweet <- gsub("http\\S+\\s*", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("http\\S+\\s*", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("http\\S+\\s*", "", foxhealth_tweet)
+#Remove punctuation
+bbchealth_tweet <- gsub("[[:punct:]]", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("[[:punct:]]", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("[[:punct:]]", "", foxhealth_tweet)
+#Remove tabs
+bbchealth_tweet <- gsub("[ |\t]{2,}", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("[ |\t]{2,}", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("[ |\t]{2,}", "", foxhealth_tweet)
+#Remove "video" word in the tweets
+bbchealth_tweet <- gsub("video", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("video", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("video", "", foxhealth_tweet)
+#Remove blank spaces at the beginning
+bbchealth_tweet <- gsub("^ ", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub("^ ", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub("^ ", "", foxhealth_tweet)
+#Remove blank spaces at the end
+bbchealth_tweet <- gsub(" $", "", bbchealth_tweet)
+cnnhealth_tweet <- gsub(" $", "", cnnhealth_tweet)
+foxhealth_tweet <- gsub(" $", "", foxhealth_tweet)
+```
+
+```{r}
+head(bbchealth_tweet)
+head(cnnhealth_tweet)
+head(foxhealth_tweet)
+```
+
+```{r}
+# Transform text file into corpus document
+bbchealth_corpus <- Corpus(VectorSource(bbchealth_tweet))
+bbchealth_corpus
+
+cnnhealth_corpus <- Corpus(VectorSource(cnnhealth_tweet))
+cnnhealth_corpus
+
+foxhealth_corpus <- Corpus(VectorSource(foxhealth_tweet))
+foxhealth_corpus
+```
+
+```{r}
+bbchealth_corpus <- tm_map(bbchealth_corpus, removeWords, stopwords("english"))
+bbchealth_corpus <- tm_map(cnnhealth_corpus, removeNumbers)
+bbchealth_corpus <- tm_map(bbchealth_corpus, stripWhitespace)
+inspect(bbchealth_corpus)
+
+cnnhealth_corpus <- tm_map(cnnhealth_corpus, removeWords, stopwords("english"))
+cnnhealth_corpus <- tm_map(cnnhealth_corpus, removeNumbers)
+cnnhealth_corpus <- tm_map(cnnhealth_corpus, stripWhitespace)
+inspect(cnnhealth_corpus)
+
+foxhealth_corpus <- tm_map(foxhealth_corpus, removeWords, stopwords("english"))
+foxhealth_corpus <- tm_map(foxhealth_corpus, removeNumbers)
+foxhealth_corpus <- tm_map(foxhealth_corpus, stripWhitespace)
+inspect(foxhealth_corpus)
+```
+
+```{r}
+# Wordlouc visualization
+wordcloud(bbchealth_corpus, min.freq = 10, colors=brewer.pal(8, "Dark2"), random.color = TRUE, max.words = 100)
+```
+
+```{r}
+wordcloud(cnnhealth_corpus,
+min.freq = 10,
+colors=brewer.pal(8, "Dark2"),
+random.color = TRUE,
+max.words = 100)
+```
+
+```{r}
+wordcloud(foxhealth_corpus,
+min.freq = 10,
+colors=brewer.pal(8, "Dark2"),
+random.color = TRUE,
+max.words = 100)
+```
+
+```{r}
+# Create Term Document Matrix (DTM)
+bbchealth_dtm <- DocumentTermMatrix(bbchealth_corpus, control = list(minWordLength = c(3,Inf), bounds = list(global = c(40,Inf))))
+
+cnnhealth_dtm <- DocumentTermMatrix(cnnhealth_corpus, control = list(minWordLength=c(3,Inf), bounds = list(global = c(40, Inf))))
+
+foxhealth_dtm <- DocumentTermMatrix(foxhealth_corpus, control = list(minWordLength=c(3,Inf), bounds = list(global = c(40, Inf))))
+
+bbchealth_dtm
+cnnhealth_dtm
+foxhealth_dtm
+```
+
+```{r}
+# Transform corpus into matrix
+bbchealth_dtm2 <- as.matrix(bbchealth_dtm)
+cnnhealth_dtm2 <- as.matrix(cnnhealth_dtm)
+foxhealth_dtm2 <- as.matrix(foxhealth_dtm)
+```
+
+```{r}
+# Import library for cluster analysis
+library(cluster)
+library(factoextra)
+```
+
+```{r}
+head(bbchealth_dtm2)
+bbc_dist <- dist(t(bbchealth_dtm2), method = "euclidean")
+kfit <- kmeans(bbc_dist, 3)
+bbc_dist
+kfit
+```
+
+```{r}
+fviz_cluster(kfit, bbc_dist)
+```
+
+```{r}
+head(bbchealth_dtm2)
+cnn_dist <- dist(t(cnnhealth_dtm2), method = "euclidian")
+kfit <- kmeans(cnn_dist, 3)
+cnn_dist
+kfit
+```
+
+```{r}
+fviz_cluster(kfit, cnn_dist)
+```
+
+```{r}
+head(foxhealth_dtm2)
+fox_dist <- dist(t(foxhealth_dtm2), method="euclidian")
+kfit <- kmeans(fox_dist, 3)
+fox_dist
+kfit
+fviz_cluster(kfit,fox_dist)
+```
+
