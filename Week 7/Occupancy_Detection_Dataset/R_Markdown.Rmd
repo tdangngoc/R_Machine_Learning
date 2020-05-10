@@ -1,0 +1,145 @@
+---
+title: "R_Markdown"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise
+
+```{r}
+# Import dataset
+occupancy_data <- read.csv("datatraining.txt", sep=",")
+occupancy_data
+```
+
+```{r}
+names(occupancy_data)
+head(occupancy_data)
+tail(occupancy_data)
+str(occupancy_data)
+summary(occupancy_data)
+dim(occupancy_data)
+```
+
+```{r}
+occupancy_data_f <- occupancy_data[,c(2,3,4,5,7)]
+occupancy_data_f
+```
+
+```{r}
+# Create new column named "euclidian_distance" with NA values
+occupancy_data_f$euclidian_distance <- NA
+occupancy_data_f
+```
+
+```{r}
+# Hold predefined Temperature, Humidity, Light and CO2 values
+tem<- 24.15
+hum<- 27.2675
+lit<- 429.5
+co2<- 715.00
+```
+
+```{r}
+# Get the number of rows
+length <- nrow(occupancy_data_f)
+
+# Calculate Euclidian distance
+for (i in 1:length)
+{
+  occupancy_data_f$euclidian_distance[i] = sqrt(
+  (occupancy_data_f$Temperature[i]-tem)^2+
+  (occupancy_data_f$Humidity[i]-hum)^2+
+  (occupancy_data_f$Light[i]-lit)^2+
+  (occupancy_data_f$CO2[i]-co2)^2
+  )
+}
+
+occupancy_data_f <- occupancy_data_f[order(occupancy_data_f$euclidian_distance),]
+occupancy_data_f
+```
+
+```{r}
+# Show the 5 first k nearest neighbours
+k <- 5
+occupancy_data_f[1:k,]
+```
+
+```{r}
+class <- sum(occupancy_data_f$Occupancy[1:k]==1)
+
+if (class > k/2)
+{
+  print("The query point belongs to class 1")
+} else
+{
+  print("The query point belongs to class 0")
+}
+```
+
+# Exercise 1 
+
+```{r}
+occupancy_test<- read.table("datatest.txt",sep = ",")
+occupancy_test
+
+occupancy_test_f<-occupancy_test[,c(2,3,4,5,7)]
+occupancy_test_f
+
+occupancy_test_f$knn_result <- NA
+occupancy_test_f
+```
+
+```{r}
+length_test <- nrow(occupancy_test_f)
+k <- 5
+#Outer loop
+for(j in 1:length_test)
+{
+  tem<- occupancy_test_f$Temperature[j]
+  hum<- occupancy_test_f$Humidity[j]
+  lit<- occupancy_test_f$Light[j]
+  co2 <-occupancy_test_f$CO2[j]
+  length <- nrow(occupancy_data_f)
+  #create new column to store euclidean distance
+  occupancy_data_f$euclidean_distance <- NA
+  #Inner loop
+  for(i in 1:length)
+  {
+    occupancy_data_f$euclidean_distance[i] = sqrt(
+    (occupancy_data_f$Temperature[i]-tem)^2+
+    (occupancy_data_f$Humidity[i]-hum)^2+
+    (occupancy_data_f$Light[i]-lit)^2+
+    (occupancy_data_f$CO2[i]-co2)^2
+    )
+  }
+  occupancy_data_f<- occupancy_data_f[order(occupancy_data_f$euclidean_distance),]
+  # determine the class label for the query data point
+  Class1 <- sum(occupancy_data_f$Occupancy[1:k]==1)
+  if (Class1 > k/2)
+  {
+    occupancy_test_f$knn_result[j]<-1
+  } else {
+    occupancy_test_f$knn_result[j]<-0
+  }
+}
+```
+
+```{r}
+correct = 0
+for(l in 1:length_test)
+{
+if(occupancy_test_f[l,5] == occupancy_test_f[l,6])
+{
+correct = correct+1
+}
+}
+Accuracy <-(correct/length_test) * 100
+print(correct)
+print(length_test)
+print(Accuracy)
+```
+
