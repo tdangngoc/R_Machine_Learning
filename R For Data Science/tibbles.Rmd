@@ -1,0 +1,149 @@
+---
+title: "Tibbles"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Prerequisites
+
+```{r}
+library(tidyverse)
+```
+
+
+# 10.2 Creating tibbles
+
+```{r}
+as_tibble(iris)
+
+tibble(
+  x = 1:5,
+  y = 1,
+  z = x^2 + y
+)
+
+tb <- tibble(
+  `:)` = "smile",
+  ` ` = "space",
+  `2000` = "number"
+)
+tb
+
+tribble(
+  ~x, ~y, ~z,
+  "a", 2, 3.6,
+  "b", 1, 8.5
+)
+```
+
+# 10.3 Tibbles vs. data.frame
+
+```{r}
+tibble(
+  a = lubridate:: now() + runif(1e3) *86400,
+  b = lubridate:: today() + runif(1e3) * 30,
+  c = 1:1e3,
+  d = runif(1e3),
+  e = sample(letters, 1e3, replace = TRUE)
+)
+```
+
+```{r}
+nycflights13::flights %>%
+  print(n = 10, width = Inf)
+```
+
+# 10.3.2 Subsetting
+
+```{r}
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+
+df
+
+# Extract by name
+df$x
+df[["x"]]
+
+# Extract by position
+df[[1]]
+
+# Extract using pipe
+df %>% .$x
+df %>% .[["x"]]
+```
+
+# Exercise 10.1
+
+```{r}
+mtcars
+# When we print mtcars, it prints all the columns.
+
+as_tibble(mtcars)
+# But when we first convert mtcars to a tibble using as_tibble(), it prints on the first ten observations. There are also some other differences in formatting of the printed data frame.
+```
+
+# Exercise 10.2
+
+```{r}
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[,"xyz"]
+df[,c("abc", "xyz")]
+
+tb <- as_tibble(df)
+tb$x
+tb[,"xyz"]
+tb[,c("abc", "xyz")]
+```
+
+The $ operator will match any column name that starts with the name following it. Since there is a column named xyz, the expression df$x will be expanded to df$xyz. This behavior of the $ operator saves a few keystrokes, but it can result in accidentally using a different column than you thought you were using.
+
+With data.frames, with [ the type of object that is returned differs on the number of columns. If it is one column, it won’t return a data.frame, but instead will return a vector. With more than one column, then it will return a data.frame. This is fine if you know what you are passing in, but suppose you did df[ , vars] where vars was a variable. Then what that code does depends on length(vars) and you’d have to write code to account for those situations or risk bugs.
+
+# Exercise 10.3
+
+You can use the double bracket, like df[[var]]. You cannot use the dollar sign, because df$var would look for a column named var.
+
+# Exercise 10.4
+
+```{r}
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+# 1
+annoying[["1"]]
+annoying$`1`
+
+# 2
+ggplot(annoying, aes(x = `1`, y = `2`)) +
+  geom_point()
+
+# 3
+mutate(annoying, `3` = `2` / `1`)
+annoying[["3"]] <- annoying[["2"]] / annoying[["1"]]
+annoying[["3"]] <- annoying$`2` / annoying$`1`
+
+# 4
+annoying <- rename(annoying, "one" = `1`, "two" = `2`, "three" = `3`)
+glimpse(annoying)
+```
+
+# Exercise 10.5
+
+```{r}
+enframe(c(a = 1, b = 2, c = 3))
+```
+
+The function tibble::enframe() converts named vectors to a data frame with names and values
+
+# Exercise 10.6
+
+The help page for the print() method of tibble objects is discussed in ?print.tbl. The n_extra argument determines the number of extra columns to print information for.
